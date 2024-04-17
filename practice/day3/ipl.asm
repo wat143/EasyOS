@@ -45,7 +45,7 @@ retry:
 	MOV	BX, 0
 	MOV	DL, 0x00	; A drive
 	INT	0x13		; Call disk BIOS
-	JNC	fin		; jump to fin if no erro
+	JNC	next		; jump to fin if no erro
 	ADD	SI, 1		; Increment retry counter
 	CMP	SI, 5		; Check retry count
 	JAE	error		; Jump if SI >= 5
@@ -68,9 +68,9 @@ next:
 	ADD	CH, 1		; Add 1 to cylinder
 	CMP	CH, CYLS
 	JB	readloop	; Jump if CH < 10
-fin:
-	HLT			; Stop CPU till interrupt
-	JMP	fin		; Infinite loop
+
+	MOV	[0x0ff0], CH	; store CH number
+	JMP	0xc200
 
 error:
 	MOV	AX, 0
@@ -87,6 +87,10 @@ putloop:
 	INT	0x10		; Call video BIOS
 	JMP	putloop
 
+fin:
+	HLT			; Stop CPU till interrupt
+	JMP	fin		; Infinite loop
+
 msg:
 	DB	0x0a, 0x0a	; 2 new lines
 	DB	"load error"
@@ -94,5 +98,4 @@ msg:
 	DB	0
 
 	RESB	0x1fe-($-$$)
-
 	DB	0x55, 0xaa
