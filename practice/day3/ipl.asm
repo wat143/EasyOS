@@ -35,10 +35,10 @@ entry:
 	MOV	CH, 0		; Cylinder 0
 	MOV	DH, 0		; Head 0
 	MOV	CL, 2		; Sector 2
+readloop:
 	MOV	SI, 0		; for error counter
 retry:
-	;; To test retry, set AH=0x03(Disk write)
-	MOV	AH, 0x03	; AH=0x02 : Disk read operation for BIOS
+	MOV	AH, 0x02	; AH=0x02 : Disk read operation for BIOS
 	MOV	AL, 1		; 1 sector
 	MOV	BX, 0
 	MOV	DL, 0x00	; A drive
@@ -51,6 +51,13 @@ retry:
 	MOV	DL, 0x00	; Reset A drive
 	INT	0x13		; Reset interrupt
 	JMP 	retry
+next:
+	MOV	AX, ES
+	ADD	AX, 0x0020	; Add 0x0020 to current load address
+	MOV	ES, AX		; Move Addr+0x0020 (0x0020 = 516/16, i.e. size of 1 sector)
+	ADD	CL, 1
+	CMP	CL, 18		
+	JBE	readloop	; move forward till sector 18
 fin:
 	HLT			; Stop CPU till interrupt
 	JMP	fin		; Infinite loop
