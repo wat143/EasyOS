@@ -28,7 +28,6 @@ entry:
 	MOV	SS, AX
 	MOV	SP, 0x7c00
 	MOV	DS, AX
-	MOV	ES, AX
 
 	;; Read disk
 	MOV	AX, 0x0820	; Start address to store disk data
@@ -36,13 +35,22 @@ entry:
 	MOV	CH, 0		; Cylinder 0
 	MOV	DH, 0		; Head 0
 	MOV	CL, 2		; Sector 2
-	MOV	AH, 0x02	; AH=0x02 : Disk read operation for BIOS
+	MOV	SI, 0		; for error counter
+retry:
+	;; To test retry, set AH=0x03(Disk write)
+	MOV	AH, 0x03	; AH=0x02 : Disk read operation for BIOS
 	MOV	AL, 1		; 1 sector
 	MOV	BX, 0
 	MOV	DL, 0x00	; A drive
 	INT	0x13		; Call disk BIOS
-	JC	error		; Jump if carry flag is set
-
+	JNC	fin		; jump to fin if no erro
+	ADD	SI, 1		; Increment retry counter
+	CMP	SI, 5		; Check retry count
+	JAE	error		; Jump if SI >= 5
+	MOV	AH, 0x00
+	MOV	DL, 0x00	; Reset A drive
+	INT	0x13		; Reset interrupt
+	JMP 	retry
 fin:
 	HLT			; Stop CPU till interrupt
 	JMP	fin		; Infinite loop
