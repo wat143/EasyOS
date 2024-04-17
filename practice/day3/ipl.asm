@@ -1,4 +1,6 @@
 ; hello-os
+CYLS	EQU	10		; Define cylinder number to be read
+
 	ORG	0x7c00		; Address where this program is loaded
 
 	JMP	entry
@@ -58,6 +60,14 @@ next:
 	ADD	CL, 1
 	CMP	CL, 18		
 	JBE	readloop	; move forward till sector 18
+	MOV	CL, 1		; Set sector 1
+	ADD	DH, 1		; Add 1 to head
+	CMP	DH, 2
+	JB	readloop	; Jump if DH < 2
+	MOV	DH, 0
+	ADD	CH, 1		; Add 1 to cylinder
+	CMP	CH, CYLS
+	JB	readloop	; Jump if CH < 10
 fin:
 	HLT			; Stop CPU till interrupt
 	JMP	fin		; Infinite loop
