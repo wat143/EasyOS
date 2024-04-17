@@ -3,7 +3,7 @@
 
 	JMP	entry
 	DB	0x90
-	DB	"HELLOIPL" 	; Boot sector name
+	DB	"HARIBOTE" 	; Boot sector name
 	DW	512	   	; Sector size. This shall be 512.
 	DB	1		; Cluster size. This shall be 1 sector.
 	DW	1		; The location FAT starts.
@@ -18,7 +18,7 @@
 	DD	2880		; Write drive size again.
 	DB	0, 0, 0x29	; Magic number
 	DD	0xffffffff	; Magic number
-	DB	"HELLO-OS   "	; Disk name(11 Byte)
+	DB	"HARIBOTEOS "	; Disk name(11 Byte)
 	DB	"FAT12   "	; Format name(8 Byte)
 	TIMES	18 DB 0
 
@@ -30,6 +30,26 @@ entry:
 	MOV	DS, AX
 	MOV	ES, AX
 
+	;; Read disk
+	MOV	AX, 0x0820	; Start address to store disk data
+	MOV	ES, AX
+	MOV	CH, 0		; Cylinder 0
+	MOV	DH, 0		; Head 0
+	MOV	CL, 2		; Sector 2
+	MOV	AH, 0x02	; AH=0x02 : Disk read operation for BIOS
+	MOV	AL, 1		; 1 sector
+	MOV	BX, 0
+	MOV	DL, 0x00	; A drive
+	INT	0x13		; Call disk BIOS
+	JC	error		; Jump if carry flag is set
+
+fin:
+	HLT			; Stop CPU till interrupt
+	JMP	fin		; Infinite loop
+
+error:
+	MOV	AX, 0
+	MOV	ES, AX
 	MOV	SI, msg
 
 putloop:
@@ -41,13 +61,10 @@ putloop:
 	MOV	BX,15		; Color code
 	INT	0x10		; Call video BIOS
 	JMP	putloop
-fin:
-	HLT			; Stop CPU till interrupt
-	JMP	fin		; Infinite loop
 
 msg:
 	DB	0x0a, 0x0a	; 2 new lines
-	DB	"hello, world"
+	DB	"load error"
 	DB	0x0a		; 1 new line
 	DB	0
 
