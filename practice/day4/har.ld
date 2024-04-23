@@ -24,6 +24,10 @@ SECTIONS
         *(.bss)
     }
 
+    .note.gnu.property : {
+        *(.note.gnu.property)
+    }
+
     /DISCARD/ : { *(.eh_frame) }
 
 }
