@@ -5,6 +5,7 @@ OBJS = haribote.asm
 ASM = nasm
 GCC = i686-linux-gnu-gcc
 QEMU = qemu-system-i386
+C_SRC = utils.c dsctbl.c graphic.c bootpack.c
 
 default:
 	make img
@@ -21,7 +22,7 @@ asmhead.bin: asmhead.asm
 nasmfunc.o: nasmfunc.asm
 	nasm -g -f elf nasmfunc.asm -o nasmfunc.o
 bootpack.hrb: bootpack.c utils.c nasmfunc.o
-	$(GCC) -march=i386 -m32 -nostdlib -fno-pic -T har.ld bootpack.c utils.c nasmfunc.o -o bootpack.hrb
+	$(GCC) -march=i386 -m32 -nostdlib -fno-pic -T har.ld $(C_SRC) nasmfunc.o -o bootpack.hrb
 haribote.sys: asmhead.bin bootpack.hrb
 	cat asmhead.bin bootpack.hrb > haribote.sys
 haribote.img: ipl10.bin haribote.sys
