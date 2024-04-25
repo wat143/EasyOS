@@ -1,3 +1,5 @@
+#include "hankaku.h"
+
 void io_hlt(void);
 void io_cli(void);
 void io_out8(int port, int data);
@@ -38,16 +40,18 @@ void HariMain(void)
   char *vram;
   int xsize, ysize;
   struct BOOTINFO *binfo;
-  static char font_A[16] = {
-    0x00, 0x18, 0x18, 0x18, 0x18, 0x24, 0x24, 0x24,
-    0x24, 0x7e, 0x42, 0x42, 0x42, 0xe7, 0x00, 0x00
-  };
 
   init_palette();
   binfo = (struct BOOTINFO *) 0x0ff0;
 
   init_screen(binfo->vram, binfo->scrnx, binfo->scrny);
-  putfont8(binfo->vram, binfo->scrnx, 10, 10, COL8_FFFFFF, font_A);
+  putfont8(binfo->vram, binfo->scrnx,  8, 8, COL8_FFFFFF, hankaku + 'A' * 16);
+  putfont8(binfo->vram, binfo->scrnx, 16, 8, COL8_FFFFFF, hankaku + 'B' * 16);
+  putfont8(binfo->vram, binfo->scrnx, 24, 8, COL8_FFFFFF, hankaku + 'C' * 16);
+  putfont8(binfo->vram, binfo->scrnx, 40, 8, COL8_FFFFFF, hankaku + '1' * 16);
+  putfont8(binfo->vram, binfo->scrnx, 48, 8, COL8_FFFFFF, hankaku + '2' * 16);
+  putfont8(binfo->vram, binfo->scrnx, 56, 8, COL8_FFFFFF, hankaku + '3' * 16);
+
   for (;;) {
     io_hlt(); // Call io_hlt defined in naskfunc.asm
   }
