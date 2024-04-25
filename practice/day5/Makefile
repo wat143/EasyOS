@@ -20,8 +20,8 @@ asmhead.bin: asmhead.asm
 	nasm asmhead.asm -o asmhead.bin
 nasmfunc.o: nasmfunc.asm
 	nasm -g -f elf nasmfunc.asm -o nasmfunc.o
-bootpack.hrb: bootpack.c nasmfunc.o
-	$(GCC) -march=i386 -m32 -nostdlib -fno-pic -T har.ld bootpack.c nasmfunc.o -o bootpack.hrb
+bootpack.hrb: bootpack.c utils.c nasmfunc.o
+	$(GCC) -march=i386 -m32 -nostdlib -fno-pic -T har.ld bootpack.c utils.c nasmfunc.o -o bootpack.hrb
 haribote.sys: asmhead.bin bootpack.hrb
 	cat asmhead.bin bootpack.hrb > haribote.sys
 haribote.img: ipl10.bin haribote.sys
