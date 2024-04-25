@@ -9,7 +9,7 @@
 	LEDS	EQU	0x0ff1
 	VMODE	EQU	0x0ff2	; bit info for color
 	SCRNX	EQU	0x0ff4	; horizontal resolution
-	SCRNY	EQU	0x00f6	; vertical resolution
+	SCRNY	EQU	0x0ff6	; vertical resolution
 	VRAM	EQU	0x0ff8	; start address of the graphics buffer
 	
 	ORG	0xc200		; Program load location
